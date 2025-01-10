@@ -30,7 +30,6 @@ class Showtime(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     hall = models.ForeignKey(Hall, on_delete=models.CASCADE)
     showtime = models.DateTimeField()
-    reserved_seats = models.ManyToManyField(Seat, blank=True)
 
     def __str__(self):
         return f"{self.movie.title} at {self.showtime} in {self.hall.name}"

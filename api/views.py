@@ -79,3 +79,23 @@ def create_seats(request, hall_id):
     
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def add_showtime(request):
+    data = request.data
+    serializer = ShowtimeSerializer(data=data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"showtime":serializer.data}, status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def showtime_list(request):
+    showtimes = Showtime.objects.all()
+    serializer = ShowtimeSerializer(showtimes, many=True)
+
+    return Response({"showtime": serializer.data}, status=status.HTTP_200_OK)
