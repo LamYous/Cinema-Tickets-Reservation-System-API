@@ -45,3 +45,37 @@ def all_halls(request):
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+def create_seats(request, hall_id):
+    try:
+        hall = Hall.objects.get(id=hall_id)
+        total_seats = hall.total_seats
+
+        is_exist = Seat.objects.filter(hall=hall).count()
+
+        if is_exist > 0:
+                return Response({
+                    "message": "Seats for this hall have already been created."
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        seats_created = []
+        for i in range(1, total_seats+1):
+            seat_number = f"Seat-{i}"
+            seat = Seat.objects.create(
+                hall=hall,
+                seat_number=seat_number
+            )
+            seats_created.append(seat.seat_number)
+
+        return Response({
+                "message": "Seats created successfully.",
+                "seats_created": seats_created
+            }, status=status.HTTP_201_CREATED)
+    
+
+    except Hall.DoesNotExist:
+        return Response({"error": "Hall not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
