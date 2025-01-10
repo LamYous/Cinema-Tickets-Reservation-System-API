@@ -17,8 +17,8 @@ class SeatSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ShowtimeSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()  
-    hall = HallSerializer()    
+    # movie = MovieSerializer()  
+    # hall = HallSerializer()    
 
     class Meta:
         model = Showtime
