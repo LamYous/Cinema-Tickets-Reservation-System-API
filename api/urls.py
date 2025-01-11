@@ -9,6 +9,7 @@ urlpatterns = [
     path('halls/', views.all_halls),
 
     path('create_seats/<int:hall_id>',views.create_seats),
+    path('available_seats/<int:hall_id>', views.available_seats),
     
     path('add_showtime/', views.add_showtime),
     path('showtimes/', views.showtime_list),
