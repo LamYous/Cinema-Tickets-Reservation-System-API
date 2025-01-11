@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 # Create your views here.
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def all_movies(request):
     movies = Movie.objects.all()
     serializer = MovieSerializer(movies, many=True)
@@ -18,6 +19,7 @@ def all_movies(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def add_movie(request):
     data = request.data
     serializer = MovieSerializer(data=data)
@@ -30,6 +32,7 @@ def add_movie(request):
     
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def add_hall(request):
     data = request.data
     serializer = HallSerializer(data=data)
@@ -41,6 +44,7 @@ def add_hall(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def all_halls(request):
     halls = Hall.objects.all()
     serializer = HallSerializer(halls, many=True)
@@ -49,6 +53,7 @@ def all_halls(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def create_seats(request, hall_id):
     try:
         hall = Hall.objects.get(id=hall_id)
@@ -84,6 +89,7 @@ def create_seats(request, hall_id):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def add_showtime(request):
     data = request.data
     serializer = ShowtimeSerializer(data=data)
@@ -96,6 +102,7 @@ def add_showtime(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def showtime_list(request):
     showtimes = Showtime.objects.all()
     serializer = ShowtimeSerializer(showtimes, many=True)
