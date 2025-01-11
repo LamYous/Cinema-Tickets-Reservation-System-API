@@ -1,9 +1,11 @@
-from .models import Hall, Seat, Movie, Showtime
-from .serializers import HallSerializer, MovieSerializer, SeatSerializer, ShowtimeSerializer
+from .models import Hall, Seat, Movie, Showtime, Reservation
+from .serializers import HallSerializer, MovieSerializer, SeatSerializer, ShowtimeSerializer, ReservationSerializer
 
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
+
+from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 
 # Create your views here.
 
@@ -99,3 +101,40 @@ def showtime_list(request):
     serializer = ShowtimeSerializer(showtimes, many=True)
 
     return Response({"showtime": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_reservation(request):
+    try:
+        user = request.user
+        showtime_id = request.data.get('showtime')
+        seat_ids = request.data.get('seats')
+
+        # Check if the showtime exists
+        showtime = Showtime.objects.filter(id=showtime_id).first()
+        if not showtime:
+            return Response({"error": "Showtime not found."}, status=status.HTTP_404_NOT_FOUND) 
+        
+        # Check if seats are available
+        available_seats = Seat.objects.filter(id__in=seat_ids, is_available=True)
+        if available_seats.count() != len(seat_ids):
+            return Response({"error": "Some seats are not available."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create the reservation
+        reservation = Reservation.objects.create(
+            user=user,
+            showtime = showtime
+        )
+        reservation.seats.set(available_seats)
+        
+        #Mark the seats as not available
+        for seat in available_seats:
+            seat.is_available = False
+            seat.save()
+        
+        serializer = ReservationSerializer(reservation)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return Response({"Error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

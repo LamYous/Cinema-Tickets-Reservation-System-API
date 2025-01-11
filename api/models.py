@@ -33,3 +33,12 @@ class Showtime(models.Model):
 
     def __str__(self):
         return f"{self.movie.title} at {self.showtime} in {self.hall.name}"
+
+class Reservation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE)
+    seats = models.ManyToManyField(Seat)
+    reservation_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reservation by {self.user.username} for {self.showtime.movie.title} on {self.reservation_date}"

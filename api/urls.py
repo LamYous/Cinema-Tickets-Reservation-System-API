@@ -12,4 +12,6 @@ urlpatterns = [
     
     path('add_showtime/', views.add_showtime),
     path('showtimes/', views.showtime_list),
+
+    path('create_reservation/', views.create_reservation),
 ]
