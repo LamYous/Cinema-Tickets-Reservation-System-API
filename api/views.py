@@ -145,3 +145,17 @@ def create_reservation(request):
     
     except Exception as e:
         return Response({"Error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def available_seats(request, hall_id):
+    try:
+        hall = Hall.objects.get(id=hall_id)
+        available_seats = Seat.objects.filter(hall=hall_id, is_available=True)
+
+        serializer = SeatSerializer(available_seats, many=True)
+
+        return Response({"count": available_seats.count(),"available seats": serializer.data}, status=status.HTTP_200_OK)
+    
+    except Hall.DoesNotExist:
+        return Response({"error":"Hall not found."}, status=status.HTTP_201_CREATED)
